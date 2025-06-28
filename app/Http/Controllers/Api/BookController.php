@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -12,7 +13,15 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        // Fetch all books from the database
+        $books = Book::orderBy('title', 'asc')->get();
+
+        // Return the books as a JSON response
+        return response()->json([
+            'success' => true,
+            'message' => 'Data buku berhasil diambil.',
+            'data' => $books,
+        ], 200);
     }
 
     /**
