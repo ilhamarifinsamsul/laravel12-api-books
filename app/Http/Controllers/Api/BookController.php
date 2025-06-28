@@ -37,7 +37,23 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Fetch a specific book from the database
+        $book = Book::findOrFail($id);
+
+        // Return the book as a JSON response
+        if ($book) {
+            return response()->json([
+                'success' => true,
+                'message' => "Data buku berhasil diambil.",
+                'data' => $book
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Data buku tidak ditemukan.",
+                'data' => null
+            ], 404);
+        }
     }
 
     /**
