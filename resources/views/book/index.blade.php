@@ -14,18 +14,34 @@
     <main class="container">
         <!-- START FORM -->
         <div class="my-3 p-3 bg-body rounded shadow-sm">
-            <form action='' method='post' enctype="multipart/form-data">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            <form action='{{ route('books.store') }}' method='post' enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3 row">
                     <label for="title" class="col-sm-2 col-form-label">Judul Buku</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name='title' id="title">
+                        <input type="text" class="form-control" name='title' id="title" value="{{ old('title') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="nama" class="col-sm-2 col-form-label">Pengarang</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name='pengarang' id="pengarang">
+                        <input type="text" class="form-control" name='pengarang' id="pengarang" value="{{ old('pengarang') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -65,7 +81,10 @@
                             <td>{{ date('d/m/Y', strtotime($d['tanggal_terbit'])) }}</td>
                             <td>
                                 <a href="" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="" class="btn btn-danger btn-sm">Del</a>
+                                <form onsubmit="return confirm('Apakah anda yakin?')" action="{{ route('books.destroy', $d['id']) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                             </td>
                         </tr>
                     @endforeach
