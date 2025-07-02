@@ -30,24 +30,29 @@
                     {{ session('success') }}
                 </div>
             @endif
-            <form action='{{ route('books.store') }}' method='post' enctype="multipart/form-data">
+            <form action='' method='post' enctype="multipart/form-data">
                 @csrf
+
+                @if (Route::current()->uri == 'books/{id}')
+                    
+                @method('PUT')
+                @endif
                 <div class="mb-3 row">
                     <label for="title" class="col-sm-2 col-form-label">Judul Buku</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name='title' id="title" value="{{ old('title') }}">
+                        <input type="text" class="form-control" name='title' id="title" value="{{ isset($data['title']) ? $data['title'] : old('title') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="nama" class="col-sm-2 col-form-label">Pengarang</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name='pengarang' id="pengarang" value="{{ old('pengarang') }}">
+                        <input type="text" class="form-control" name='pengarang' id="pengarang" value="{{ isset($data['pengarang']) ? $data['pengarang'] : old('pengarang') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="tanggal_terbit" class="col-sm-2 col-form-label">Tanggal Terbit</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control w-50" name='tanggal_terbit' id="tanggal_terbit">
+                        <input type="date" class="form-control w-50" name='tanggal_terbit' id="tanggal_terbit" value="{{ isset($data['tanggal_terbit']) ? $data['tanggal_terbit'] : old('tanggal_terbit') }}">
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -59,6 +64,8 @@
         </div>
         <!-- AKHIR FORM -->
 
+        @if (Route::current()->uri == 'books')
+            
         <!-- START DATA -->
         <div class="my-3 p-3 bg-body rounded shadow-sm">
             <table class="table table-striped">
@@ -80,7 +87,7 @@
                             <td>{{ $d['pengarang'] }}</td>
                             <td>{{ date('d/m/Y', strtotime($d['tanggal_terbit'])) }}</td>
                             <td>
-                                <a href="" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="{{ route('books.edit', $d['id']) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form onsubmit="return confirm('Apakah anda yakin?')" action="{{ route('books.destroy', $d['id']) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
@@ -93,6 +100,7 @@
             </table>
 
         </div>
+        @endif
         <!-- AKHIR DATA -->
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"

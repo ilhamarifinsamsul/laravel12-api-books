@@ -70,10 +70,10 @@ class BookController extends Controller
         $tanggal_terbit = $request->tanggal_terbit;
 
         $response = $this->client->request('POST', $this->apiUrl, [
-            'headers' => [
+            'Accept' => [
                 'Content-type' => 'application/json',
             ],
-            'body' => [
+            'form_params' => [
                 'title' => $title,
                 'pengarang' => $pengarang,
                 'tanggal_terbit' => $tanggal_terbit,
@@ -85,12 +85,12 @@ class BookController extends Controller
         if ($contentArray['success'] != true)
         {
             $error = $contentArray['data'];
-            return redirect()->to('books.index')
+            return redirect()->to('books')
                 ->withErrors($error)
                 ->withInput();
         } else 
         {
-            return redirect()->to('books.index')
+            return redirect()->to('books')
                 ->with('success', 'Buku berhasil ditambahkan');
         }
         
@@ -110,7 +110,20 @@ class BookController extends Controller
      */
     public function edit(string $id)
     {
-        //
+
+        $response = $this->client->request('GET', $this->apiUrl . '/' . $id);
+        $contentArray = json_decode($response->getBody(), true);
+            
+        if ($contentArray['success'] != true) {
+            $error = $contentArray['data'];
+            return redirect()->to('books')->withErrors($error)->withInput();
+        } else {
+            $data = $contentArray['data'];
+            return view('book.index', [
+                'data' => $data,
+            ]);
+        }
+     
     }
 
     /**
@@ -118,7 +131,34 @@ class BookController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $title = $request->title;
+        $pengarang = $request->pengarang;
+        $tanggal_terbit = $request->tanggal_terbit;
+
+        $response = $this->client->request('PUT', $this->apiUrl . '/' . $id, [
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+            'form_params' => [
+                'title' => $title,
+                'pengarang' => $pengarang,
+                'tanggal_terbit' => $tanggal_terbit,
+            ]
+        ]);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+        
+        if ($contentArray['success'] != true)
+        {
+            $error = $contentArray['data'];
+            return redirect()->to('books')
+                ->withErrors($error)
+                ->withInput();
+        } else 
+        {
+            return redirect()->to('books')
+                ->with('success', 'Buku berhasil diupdate');
+        }
     }
 
     /**
@@ -126,6 +166,21 @@ class BookController extends Controller
      */
     public function destroy(string $id)
     {
-        
+        // Delete data buku
+        $response = $this->client->request('DELETE', $this->apiUrl . '/' . $id);
+        $content = $response->getBody()->getContents();
+        $contentArray = json_decode($content, true);
+
+        if ($contentArray['success'] != true)
+        {
+            $error = $contentArray['data'];
+            return redirect()->to('books')
+                ->withErrors($error)
+                ->withInput();
+        } else 
+        {
+            return redirect()->to('books')
+                ->with('success', 'Buku berhasil dihapus');
+        }
     }
 }
